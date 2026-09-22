@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Jornada Avatar: O Mestre das Frações</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* CONTAINER PRINCIPAL DO JOGO */
+    .game-card {
+      background: #1e293b;
+      width: 650px;
+      min-height: 520px;
+      border-radius: 20px;
+      border: 3px solid #38bdf8;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+    }
+
+    /* ESTADOS DAS TELAS */
+    .screen {
+      display: none;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.5s ease-in-out forwards;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* --- TELA 1: VIAGEM DE MAPA (ANIMADA EM CSS) --- */
+    .map-container {
+      width: 100%;
+      height: 300px;
+      background: #0284c7;
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid #38bdf8;
+    }
+
+    .cloud {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      height: 30px;
+      width: 80px;
+      animation: moveClouds 10s linear infinite;
+    }
+
+    @keyframes moveClouds {
+      from { transform: translateX(-100px); }
+      to { transform: translateX(650px); }
+    }
+
+    .route-line {
+      position: absolute;
+      top: 50%;
+      left: 10%;
+      width: 80%;
+      height: 4px;
+      border-top: 4px dashed #fde047;
+    }
+
+    .traveler {
+      position: absolute;
+      top: calc(50% - 25px);
+      left: 10%;
+      font-size: 2.5rem;
+      transition: left 3s ease-in-out;
+      z-index: 10;
+    }
+
+    .travel-text {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: #38bdf8;
+      font-weight: bold;
+    }
+
+    /* --- TELA 2: SABEDORIA & MINIATURA DO PERSONAGEM --- */
+    .character-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar-frame {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      border: 4px solid #fde047;
+      background: #334155;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: contrast(115%) saturate(110%) drop-shadow(0px 2px 4px rgba(0,0,0,0.4));
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .wisdom-quote {
+      background: #334155;
+      border-left: 5px solid #fde047;
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-style: italic;
+      font-size: 1.05rem;
+      color: #f1f5f9;
+      margin: 10px 0;
+      text-align: center;
+      max-width: 500px;
+    }
+
+    /* --- TELA 3: DESAFIO DE FRAÇÕES --- */
+    .stage-header {
+      font-size: 1.4rem;
+      color: #38bdf8;
+      margin-bottom: 5px;
+    }
+
+    .location-title {
+      font-size: 1rem;
+      color: #94a3b8;
+      margin-bottom: 15px;
+    }
+
+    .fracoes-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .sinal-mais {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #fde047;
+      margin: -2px 0;
+    }
+
+    .retangulo {
+      display: flex;
+      border: 2px solid #38bdf8;
+      width: 450px;
+      height: 48px;
+      background: #0f172a;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .parte {
+      flex: 1;
+      border-right: 1px solid #1e293b;
+    }
+
+    .parte:last-child {
+      border-right: none;
+    }
+
+    .pintado {
+      background: #0284c7;
+    }
+
+    input[type="text"] {
+      margin-top: 15px;
+      padding: 10px;
+      font-size: 1.1em;
+      border: 2px solid #38bdf8;
+      border-radius: 8px;
+      width: 160px;
+      text-align: center;
+      background: #0f172a;
+      color: #fff;
+      outline: none;
+    }
+
+    button {
+      margin-top: 15px;
+      background: #0284c7;
+      color: #fff;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+      font-weight: bold;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    button:hover {
+      background: #0369a1;
+      transform: translateY(-2px);
+    }
+
+    #resultado {
+      margin-top: 15px;
+      font-weight: bold;
+      min-height: 25px;
+    }
+
+    .badge-nivel {
+      background: #fde047;
+      color: #0f172a;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.85rem;
+    }
+
+    /* --- TELA 4: VITÓRIA FINAL --- */
+    .victory-box {
+      text-align: center;
+    }
+
+    .victory-icon {
+      font-size: 4rem;
+      margin-bottom: 10px;
+      animation: pulse 1.5s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.15); }
+    }
+
+    .victory-title {
+      font-size: 2.2rem;
+      color: #fde047;
+      margin-bottom: 10px;
+    }
+
+    .victory-sub {
+      font-size: 1.1rem;
+      color: #cbd5e1;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-card">
+
+    <!-- TELA 1: ANIMAÇÃO DE VIAGEM -->
+    <div id="screen-travel" class="screen active">
+      <div class="map-container">
+        <div class="cloud" style="top: 20px;"></div>
+        <div class="cloud" style="top: 150px; animation-delay: 3s;"></div>
+        <div class="route-line"></div>
+        <div id="traveler-icon" class="traveler">🦬</div>
+      </div>
+      <div class="travel-text" id="travel-text">Viajando...</div>
+    </div>
+
+    <!-- TELA 2: ENSINAMENTO E MINIATURA DO PERSONAGEM -->
+    <div id="screen-wisdom" class="screen">
+      <div class="character-box">
+        <span class="badge-nivel" id="wisdom-level">Nível 1</span>
+        
+        <!-- MINIATURA DO PERSONAGEM -->
+        <div class="avatar-frame">
+          <img id="wisdom-img" class="avatar-img" src="" alt="Personagem Avatar">
+        </div>
+
+        <h2 id="wisdom-author">Aang</h2>
+        <div class="wisdom-quote" id="wisdom-quote">
+          "Frase de sabedoria aqui..."
+        </div>
+        <button onclick="iniciarDesafio()">Aceitar Desafio</button>
+      </div>
+    </div>
+
+    <!-- TELA 3: DESAFIO DE FRAÇÕES -->
+    <div id="screen-challenge" class="screen">
+      <div class="stage-header" id="challenge-stage">Fase 1 de 8</div>
+      <div class="location-title" id="challenge-location">📍 Local</div>
+      
+      <div id="frações" class="fracoes-container"></div>
+
+      <input type="text" id="resposta" placeholder="Ex: 22/15" autocomplete="off">
+      <br>
+      <button onclick="verificar()">Enviar Resposta</button>
+      <div id="resultado"></div>
+    </div>
+
+    <!-- TELA 4: TELA FINAL DE PARABÉNS -->
+    <div id="screen-victory" class="screen">
+      <div class="victory-box">
+        <div class="victory-icon">🏆✨</div>
+        <h1 class="victory-title">PARABÉNS, AVATAR!</h1>
+        <p class="victory-sub">
+          Você percorreu todo o mundo, aprendeu com os grandes mestres e completou a sua jornada dominando a arte das <strong>frações</strong>!
+        </p>
+        <div class="wisdom-quote" style="margin: 0 auto 20px auto;">
+          "O verdadeiro poder não está em vencer os outros, mas em dominar a si mesmo."
+        </div>
+        <button onclick="reiniciarJogo()">Reiniciar Jornada</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // DADOS DAS FASES COM IMAGENS DE ILUSTRAÇÃO DOS PERSONAGENS
+    const fases = [
+      {
+        fase: 1,
+        local: "Templo do Ar do Sul",
+        personagem: "Aang",
+        imagem: "aang.jpeg", 
+        veiculo: "🦬", 
+        nivel: "A sabedoria da coragem",
+        frase: "Quando estamos com medo, ainda podemos escolher fazer a coisa certa."
+      },
+      {
+        fase: 2,
+        local: "Tribo da Água do Sul",
+        personagem: "Katara",
+        imagem: "katara.png", 
+        veiculo: "⛵",
+        nivel: "A sabedoria da compaixão",
+        frase: "A bondade é uma força que nunca deve ser subestimada."
+      },
+      {
+        fase: 3,
+        local: "Reino da Terra",
+        personagem: "Toph",
+        imagem: "toph.jpeg", 
+        veiculo: "🦬",
+        nivel: "A sabedoria da perseverança",
+        frase: "Os obstáculos existem para mostrar o quanto você pode crescer."
+      },
+      {
+        fase: 4,
+        local: "Ba Sing Se",
+        personagem: "Rei Bumi",
+        imagem: "rei_bumi.jpeg", 
+        veiculo: "🚃",
+        nivel: "A sabedoria da criatividade",
+        frase: "Às vezes, a melhor solução é aquela que ninguém imaginou."
+      },
+      {
+        fase: 5,
+        local: "Palácio da Nação do Fogo",
+        personagem: "Zuko",
+        imagem: "zuko.jpeg", 
+        veiculo: "🚢",
+        nivel: "A sabedoria da mudança",
+        frase: "Nunca é tarde para mudar e escolher o caminho certo."
+      },
+      {
+        fase: 6,
+        local: "Biblioteca de Wan Shi Tong",
+        personagem: "Tio Iroh",
+        imagem: "tio_iroh.jpeg", 
+        veiculo: "🦬",
+        nivel: "A sabedoria da verdadeira força",
+        frase: "A verdadeira força vem do equilíbrio entre conhecimento, humildade e coragem."
+      },
+      {
+        fase: 7,
+        local: "Templo do Leão-Tartaruga",
+        personagem: "Avatar Roku",
+        imagem: "avatar_roku.jpeg", 
+        veiculo: "🐉",
+        nivel: "A sabedoria dos avatares passados",
+        frase: "Cada geração prepara o caminho para a próxima."
+      },
+      {
+        fase: 8,
+        local: "Vale Final",
+        personagem: "Avatar Aang",
+        imagem: "avatar_aang.jpeg", 
+        veiculo: "🌀",
+        nivel: "Mestre dos quatro elementos",
+        frase: "O verdadeiro poder não está em vencer os outros, mas em dominar a si mesmo."
+      }
+    ];
+
+    let faseAtualIndex = 0;
+    let num1, den1, num2, den2;
+
+    // Função para calcular Máximo Divisor Comum (para simplificar frações se necessário)
+    function mdc(a, b) {
+      return b === 0 ? a : mdc(b, a % b);
+    }
+
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    // ANIMAÇÃO DE VIAGEM NO MAPA
+    function iniciarViagem() {
+      const faseData = fases[faseAtualIndex];
+      showScreen('screen-travel');
+
+      const traveler = document.getElementById('traveler-icon');
+      const travelText = document.getElementById('travel-text');
+
+      traveler.innerText = faseData.veiculo;
+      traveler.style.left = "10%";
+      travelText.innerText = `Viajando para: ${faseData.local}...`;
+
+      setTimeout(() => {
+        traveler.style.left = "75%";
+      }, 100);
+
+      setTimeout(() => {
+        carregarSabedoria();
+      }, 3200);
+    }
+
+    // TELA DO PERSONAGEM E FRASE
+    function carregarSabedoria() {
+      const faseData = fases[faseAtualIndex];
+      document.getElementById('wisdom-level').innerText = faseData.nivel;
+      document.getElementById('wisdom-img').src = faseData.imagem;
+      document.getElementById('wisdom-author').innerText = faseData.personagem;
+      document.getElementById('wisdom-quote').innerText = `"${faseData.frase}"`;
+      
+      showScreen('screen-wisdom');
+    }
+
+    // TELA DO DESAFIO
+    function iniciarDesafio() {
+      const faseData = fases[faseAtualIndex];
+      document.getElementById('challenge-stage').innerText = `Fase ${faseData.fase} de 8`;
+      document.getElementById('challenge-location').innerText = `📍 ${faseData.local}`;
+      document.getElementById('resultado').innerHTML = "";
+      document.getElementById('resposta').value = "";
+
+      gerarFrações();
+      showScreen('screen-challenge');
+    }
+
+    // GERADOR DE FRAÇÕES COM DENOMINADORES DIFERENTES
+    function gerarFrações() {
+      let container = document.getElementById("frações");
+      container.innerHTML = "";
+
+      // Garante denominadores diferentes entre 2 e 7
+      den1 = Math.floor(Math.random() * 6) + 2; // Sorteia de 2 a 7
+      do {
+        den2 = Math.floor(Math.random() * 6) + 2; // Sorteia de 2 a 7
+      } while (den1 === den2); // Força den2 a ser diferente de den1
+
+      // Sorteia numeradores maiores que 0 e menores que os denominadores
+      num1 = Math.floor(Math.random() * (den1 - 1)) + 1;
+      num2 = Math.floor(Math.random() * (den2 - 1)) + 1;
+
+      // Criar Primeiro Retângulo
+      container.appendChild(criarRetangulo(num1, den1));
+
+      // Sinal de Adição entre os dois retângulos
+      let sinal = document.createElement("div");
+      sinal.className = "sinal-mais";
+      sinal.innerText = "+";
+      container.appendChild(sinal);
+
+      // Criar Segundo Retângulo (Mesmo tamanho externo de 450px, dividida por den2)
+      container.appendChild(criarRetangulo(num2, den2));
+    }
+
+    function criarRetangulo(numerador, denominador) {
+      let ret = document.createElement("div");
+      ret.className = "retangulo";
+
+      // Sorteia partes aleatórias para pintar
+      let indicesPintados = new Set();
+      while (indicesPintados.size < numerador) {
+        let idxSorteado = Math.floor(Math.random() * denominador);
+        indicesPintados.add(idxSorteado);
+      }
+
+      for (let j = 0; j < denominador; j++) {
+        let parte = document.createElement("div");
+        parte.className = "parte";
+        
+        if (indicesPintados.has(j)) {
+          parte.classList.add("pintado");
+        }
+        ret.appendChild(parte);
+      }
+
+      return ret;
+    }
+
+    // VERIFICAÇÃO DA SOMA DE FRAÇÕES
+    function verificar() {
+      let resposta = document.getElementById("resposta").value.trim();
+
+      // Cálculo exato da soma das frações (a/b + c/d = (a*d + b*c) / (b*d))
+      let numResultado = (num1 * den2) + (num2 * den1);
+      let denResultado = den1 * den2;
+
+      // Resposta no formato direto (ex: 22/15)
+      let respostaPadrao = numResultado + "/" + denResultado;
+
+      // Resposta no formato simplificado
+      let divisorComum = mdc(numResultado, denResultado);
+      let respostaSimplificada = (numResultado / divisorComum) + "/" + (denResultado / divisorComum);
+
+      // Aceita tanto a fração direta quanto a fração simplificada
+      if (resposta === respostaPadrao || resposta === respostaSimplificada) {
+        document.getElementById("resultado").innerHTML = 
+          "<span style='color: #4ade80;'>✨ Excelente! Desafio concluído com sucesso.</span>";
+
+        setTimeout(() => {
+          faseAtualIndex++;
+          if (faseAtualIndex < fases.length) {
+            iniciarViagem();
+          } else {
+            showScreen('screen-victory');
+          }
+        }, 1500);
+
+      } else {
+        document.getElementById("resultado").innerHTML = 
+          "<span style='color: #f87171;'>❌ Resposta incorreta. Lembre-se de somar usando um denominador comum!</span>";
+      }
+    }
+
+    function reiniciarJogo() {
+      faseAtualIndex = 0;
+      iniciarViagem();
+    }
+
+    window.onload = iniciarViagem;
+  </script>
+</body>
+</html>
